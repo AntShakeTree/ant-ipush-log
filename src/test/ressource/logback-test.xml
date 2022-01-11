@@ -1,0 +1,28 @@
+<configuration>
+
+    <appender name="KafkaAppender" class="com.ant.ipush.kafka.KafkaAppender">
+        <encoder>
+            <pattern>%msg</pattern>
+        </encoder>
+
+        <topic>header2</topic>
+        <keyingStrategy class="com.ant.ipush.keying.HostNameKeyingStrategy"/>
+        <deliveryStrategy class="com.ant.ipush.kafka.delivery.AsynchronousDeliveryStrategy"/>
+
+        <producerConfig>bootstrap.servers=localhost:9092</producerConfig>
+    </appender>
+    <logger name="LogbackIntegrationIT" additivity="false" level="info">
+        <appender-ref ref="KafkaAppender"/>
+    </logger>
+
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="warn">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>
