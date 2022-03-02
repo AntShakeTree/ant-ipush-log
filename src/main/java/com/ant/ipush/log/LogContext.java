@@ -6,6 +6,7 @@ import com.ant.ipush.domain.JSON;
 import com.ant.ipush.domain.LogAnalytics;
 import lombok.Getter;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,14 +19,14 @@ public class LogContext {
 
     static ThreadLocal<LogContext> LOCAL = new ThreadLocal<>();
     private static LogContext INSTANCE = new LogContext();
-    private LogAnalytics logAnalytics;
+//    private LogAnalytics logAnalytics;
 
     @Getter
     private Map<String, Object> mapper;
 
-    public LogAnalytics getContent() {
-        return this.logAnalytics;
-    }
+//    public LogAnalytics getContent() {
+//        return this.logAnalytics;
+//    }
 
     private Logger logger;
 
@@ -109,8 +110,8 @@ public class LogContext {
 
     public void warn() {
         Objects.requireNonNull(this.logger);
-        Objects.requireNonNull(this.logAnalytics);
-        this.logger.warn(logAnalytics.toString());
+//        Objects.requireNonNull(this.logAnalytics);
+//        this.logger.warn(logAnalytics.toString());
         LogContext.clear();
     }
 
@@ -125,18 +126,22 @@ public class LogContext {
         return this;
     }
 
-    protected LogContext log(Logger logger) {
-
+    public LogContext log(Logger logger) {
         this.logger = logger;
         return this;
     }
 
-
-    @Override
-    public String toString() {
-        if (logAnalytics == null) return "";
-        return JSON.toJSONString(logAnalytics);
+    public LogContext log(String name) {
+        this.logger = LoggerFactory.getLogger(name);
+        return this;
     }
+
+
+//    @Override
+//    public String toString() {
+//        if (logAnalytics == null) return "";
+//        return JSON.toJSONString(logAnalytics);
+//    }
 
 
 }

@@ -1,6 +1,7 @@
 package com.ant.ipush.kafka;
 
 
+import com.ant.ipush.log.LogContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,9 +28,8 @@ public class LogbackIntegrationIT {
     @Test
     public void testLogging() {
 
-        for (int i = 0; i < 1000; ++i) {
-            logger.info("message" + (i));
-        }
+        LogContext.instance().log(logger).appender("k","v").info();
+
 
 
     }
