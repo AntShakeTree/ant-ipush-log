@@ -126,10 +126,11 @@ public final class PropertiesUtil {
 
 
     static InputStream getInputStream(String path, Class clazz, ClassLoader classLoader) throws IOException {
-        InputStream is;
+        InputStream is = null;
         if (clazz != null) {
             is = clazz.getResourceAsStream(path);
-        } else if (classLoader != null) {
+        }
+        if (is == null && classLoader != null) {
             is = classLoader.getResourceAsStream(path);
         } else {
             is = ClassLoader.getSystemResourceAsStream(path);
@@ -354,7 +355,7 @@ public final class PropertiesUtil {
                 if (classLoader != null) {
                     InputStream inputStream = getInputStream(yaml, PropertiesUtil.class, classLoader);
                     YmlUtil ymlUtil = new YmlUtil(new HashMap<>());
-                    if(inputStream != null) {
+                    if (inputStream != null) {
                         ymlUtil.switchToMap(null, yaml1.load(inputStream));
                     }
                     properties.putAll(ymlUtil.getYmlMap());
@@ -381,7 +382,7 @@ public final class PropertiesUtil {
             InputStream in = null;
             try {
                 in = getInputStream(name, PropertiesUtil.class, classLoader);
-                if(in != null) {
+                if (in != null) {
                     properties.load(in);
                 }
             } catch (final IOException ioe) {
@@ -424,7 +425,7 @@ public final class PropertiesUtil {
     }
 
     public static void main(String[] args) {
-        System.setProperty("spring.profiles.active", "local");
+//        System.setProperty("spring.profiles.active", "local");
         System.out.println(PropertiesUtil.getProperties().getStringProperty("AsyncLogger.RingBufferSize"));
     }
 
