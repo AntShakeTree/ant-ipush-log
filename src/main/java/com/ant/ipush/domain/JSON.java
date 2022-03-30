@@ -51,7 +51,7 @@ public class JSON {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        objectMapper.setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategy.SNAKE_CASE);
+//        objectMapper.setPropertyNamingStrategy(com.fasterxml.jackson.databind.PropertyNamingStrategy.SNAKE_CASE);
         JavaTimeModule javaTimeModule = new JavaTimeModule();
         javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)));
         javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)));
@@ -81,21 +81,26 @@ public class JSON {
     }
 
 
-    public static Map<String, Object> convertMap(Map<String, Object> map) {
-        Map<String, Object> result = new HashMap<String, Object>();
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            result.put(mapKey(key), value);
-            if (key.equalsIgnoreCase("aType")) {
-                result.put("atype", value);
-                result.put("event", value);
-            }
-        }
-        return result;
-    }
+//    public static Map<String, Object> convertMap(Map<String, Object> map) {
+//        Map<String, Object> result = new HashMap<String, Object>();
+//        for (Map.Entry<String, Object> entry : map.entrySet()) {
+//            String key = entry.getKey();
+//            Object value = entry.getValue();
+//            result.put(mapKey(key), value);
+//            if (key.equalsIgnoreCase("aType")) {
+//                result.put("atype", value);
+//                result.put("event", value);
+//            }
+//        }
+//        return result;
+//    }
 
     private static String mapKey(String key) {
         return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, key);
+    }
+
+    @SneakyThrows
+    public static Object toJSONBytes(Object eventMessageData) {
+        return objectMapper.writeValueAsBytes(eventMessageData);
     }
 }

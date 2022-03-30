@@ -1,68 +1,68 @@
 package com.ant.ipush.log;
 
-//import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSON;
+import com.ant.ipush.domain.EventMessageData;
 
-import com.ant.ipush.domain.JSON;
-import com.ant.ipush.domain.LogAnalytics;
-import lombok.Getter;
+import com.ant.ipush.domain.MessagePayload;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class LogContext {
 
     static ThreadLocal<LogContext> LOCAL = new ThreadLocal<>();
-    private static LogContext INSTANCE = new LogContext();
-//    private LogAnalytics logAnalytics;
-
-    @Getter
-    private Map<String, Object> mapper;
-
-//    public LogAnalytics getContent() {
-//        return this.logAnalytics;
-//    }
+    
+    private EventMessageData eventMessageData;
+    //    private Logger recorder;
+    private static Object lock = new Object();
 
     private Logger logger;
 
     private LogContext() {
     }
 
-    public static LogContext instance() {
+    public static LogContext instance(Logger logger) {
+
         if (LOCAL.get() == null) {
-            LOCAL.set(new LogContext());
+            synchronized (lock) {
+                EventMessageData eventMessageData = new EventMessageData();
+                MessagePayload messagePayload = new MessagePayload();
+                eventMessageData.setPayload(messagePayload);
+                LogContext logContext = new LogContext();
+                Map<String, Object> mapper = new HashMap<>();
+                logContext.setEventMessageData(eventMessageData);
+                eventMessageData.setMetaData(mapper);
+                logContext.log(logger);
+                LOCAL.set(logContext);
+            }
+
         }
         return LOCAL.get();
     }
 
-    public static Optional find() {
-        return Optional.ofNullable(LOCAL);
+    public static Optional<LogContext> find() {
+        return Optional.ofNullable(LOCAL.get());
     }
 
     public static void clear() {
-
-        if (LOCAL.get() != null && LOCAL.get().getMapper() != null) {
-            LOCAL.get().getMapper().clear();
+        if (LOCAL.get() != null) {
+            LOCAL.get().getEventMessageData().getMetaData().clear();
+            LOCAL.get().setEventMessageData(null);
         }
         LOCAL.remove();
     }
 
+    private void setEventMessageData(EventMessageData o) {
+        this.eventMessageData = o;
+    }
 
-//    public LogContext appender(LogAnalytics logAnalytics) {
-//        logAnalytics(BeanSupport.copyProperties(logAnalytics, this.logAnalytics == null ? new LogAnalytics() : this.logAnalytics));
-//        return this;
-//    }
+    private EventMessageData getEventMessageData() {
+        return this.eventMessageData;
+    }
+
 
     public LogContext appender(String key, String value) {
-        if (this.mapper == null) {
-            mapper(new HashMap<>());
-        }
-        this.mapper.put(key, value);
+        this.getEventMessageData().getMetaData().put(key, value);
         return this;
     }
 
@@ -70,78 +70,95 @@ public class LogContext {
         infoMapper();
     }
 
-//    public void info(Object bean) {
+//
+//    public void info(String json) {
 //        Objects.requireNonNull(this.logger);
-//        if (this.mapper == null) {
-//            this.mapper(BeanSupport.convertMapFromBean(bean));
-//        }
-//        appender("ts", System.currentTimeMillis() + "");
-//        appender("ds", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
-//        this.infoMapper();
+//        this.logger.info(json);
 //        LogContext.clear();
 //    }
 
-    public void info(String json) {
-        Objects.requireNonNull(this.logger);
-        this.logger.info(json);
-        LogContext.clear();
-    }
 
-
-    public void infoMapper() {
+    private void infoMapper() {
         Objects.requireNonNull(this.logger);
-        Objects.requireNonNull(this.mapper);
-        if (this.getMapper().get("ts") == null)
-            appender("ts", System.currentTimeMillis() + "");
-        if (this.getMapper().get("ds") == null)
-            appender("ds", LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
-        if (this.getMapper().get("channel") == null) {
-            appender("channel", "0000");
+        Objects.requireNonNull(this.eventMessageData);
+        Objects.requireNonNull(this.eventMessageData.getPayload().getEvent(), "Event is required.");
+        Objects.requireNonNull(this.eventMessageData.getPayload().getTopicName(), "Topic name is required.");
+        if (this.eventMessageData.getIdentifier() == null || "".equals(this.eventMessageData.getIdentifier())) {
+            eventMessageData.setIdentifier(UUID.randomUUID().toString());
         }
-        this.logger.info(JSON.toJSONString(JSON.convertMap(this.mapper)));
-        LogContext.clear();
-    }
-
-    public void warn(String json) {
-        Objects.requireNonNull(this.logger);
-        this.logger.warn(json);
-        LogContext.clear();
-    }
-
-    public void warn() {
-        Objects.requireNonNull(this.logger);
-//        Objects.requireNonNull(this.logAnalytics);
-//        this.logger.warn(logAnalytics.toString());
+        this.logger.info(JSON.toJSONString(eventMessageData));
+//        if (this.recorder!=null){
+//            this.recorder.info("{}",JSON.toJSONString(eventMessageData));
+//        }
         LogContext.clear();
     }
 
 
-//    public LogContext logAnalytics(LogAnalytics logAnalytics) {
-//        this.logAnalytics = logAnalytics;
-//        return this;
-//    }
-
-    public LogContext mapper(Map<String, Object> mapper) {
-        this.mapper = mapper;
+    protected LogContext mapper(Map<String, Object> mapper) {
+        this.getEventMessageData().setMetaData(mapper);
         return this;
     }
 
-    public LogContext log(Logger logger) {
+    private LogContext log(Logger logger) {
         this.logger = logger;
         return this;
     }
 
-    public LogContext log(String name) {
-        this.logger = LoggerFactory.getLogger(name);
+    public LogContext event(String event) {
+        this.event(event, null);
         return this;
     }
 
+    public LogContext identifier(String id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id is null");
+        }
+        if (id.trim().length() == 0) {
+            throw new IllegalArgumentException("id is empty");
+        }
 
-//    @Override
-//    public String toString() {
-//        if (logAnalytics == null) return "";
-//        return JSON.toJSONString(logAnalytics);
+        this.eventMessageData.setIdentifier(id);
+        return this;
+    }
+
+    public LogContext topic(String topic) {
+        this.getEventMessageData().getPayload().setTopicName(topic);
+        return this;
+    }
+
+    public LogContext event(String event, String scene) {
+        this.getEventMessageData().event(event, scene);
+        return this;
+    }
+
+    public LogContext event(String event, String scene, String topic) {
+        this.getEventMessageData().event(event, scene);
+        this.getEventMessageData().getPayload().setTopicName(topic);
+        return this;
+    }
+
+    public LogContext biz(String biz) {
+        this.getEventMessageData().getPayload().setBiz(biz);
+
+        return this;
+    }
+
+    public LogContext event(String event, String scene, String topic, String biz) {
+        this.getEventMessageData().event(event, scene);
+        this.getEventMessageData().getPayload().setTopicName(topic);
+        this.getEventMessageData().getPayload().setBiz(biz);
+        return this;
+    }
+
+    public LogContext appenderAll(Map<String, Object> map) {
+        this.getEventMessageData().mergeMetaData(map);
+        return this;
+    }
+
+    //    public LogContext recorder(Logger logger){
+//        this.logger=logger;
+//        return this;
 //    }
-
-
+//    public static void main(String[] args) {
+//    }
 }

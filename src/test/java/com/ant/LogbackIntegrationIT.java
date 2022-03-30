@@ -1,7 +1,6 @@
 package com.ant;
 
 
-import com.ant.ipush.domain.LogAnalytics;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;

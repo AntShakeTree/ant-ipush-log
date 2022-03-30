@@ -7,6 +7,7 @@ import com.ant.ipush.kafka.delivery.AsynchronousDeliveryStrategy;
 import com.ant.ipush.kafka.delivery.DeliveryStrategy;
 import com.ant.ipush.keying.KeyingStrategy;
 import com.ant.ipush.keying.NoKeyKeyingStrategy;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ public abstract class KafkaAppenderConfig<E> extends UnsynchronizedAppenderBase<
 
     protected Encoder<E> encoder = null;
     protected KeyingStrategy<? super E> keyingStrategy = null;
+    @Getter
     protected DeliveryStrategy deliveryStrategy;
 
     protected Integer partition = null;

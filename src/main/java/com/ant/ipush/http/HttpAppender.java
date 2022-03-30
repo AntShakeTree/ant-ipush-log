@@ -4,7 +4,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.spi.AppenderAttachableImpl;
 import com.alibaba.fastjson.JSON;
-import com.ant.ipush.domain.LogAnalytics;
 import com.ant.ipush.kafka.delivery.FailedDeliveryCallback;
 
 import java.util.HashMap;

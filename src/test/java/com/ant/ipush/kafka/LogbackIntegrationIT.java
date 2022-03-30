@@ -1,7 +1,6 @@
 package com.ant.ipush.kafka;
 
 
-import com.ant.ipush.log.LogContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
