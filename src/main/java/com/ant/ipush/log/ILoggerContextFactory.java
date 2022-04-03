@@ -38,7 +38,9 @@ public abstract class ILoggerContextFactory {
     public static LogContext loggerWrapper(Logger logger) {
         return LogContext.instance(loggerMap.computeIfAbsent(logger.getName(), key -> wrapperAsynAppender(logger)));
     }
-
+    public static LogContext loggerWrapper(Logger logger,Level level) {
+        return LogContext.instance(loggerMap.computeIfAbsent(logger.getName(), key -> wrapperAsynAppender(logger,level)));
+    }
     private static Logger wrapperAsynAppender(Logger logger) {
         if (logger instanceof ch.qos.logback.classic.Logger) {
             ch.qos.logback.classic.Logger logger1 = (ch.qos.logback.classic.Logger) logger;
