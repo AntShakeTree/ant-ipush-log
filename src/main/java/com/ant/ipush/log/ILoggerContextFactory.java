@@ -1,5 +1,6 @@
 package com.ant.ipush.log;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import com.ant.ipush.asyn.AsyncKafkaLoggerAppender;
 import org.slf4j.Logger;
@@ -10,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public abstract class ILoggerContextFactory {
+
+
     private static Map<String, Logger> loggerMap = new ConcurrentHashMap<>();
 
     public static LogContext create(String name) {
