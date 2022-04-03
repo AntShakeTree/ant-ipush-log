@@ -45,7 +45,19 @@ public abstract class ILoggerContextFactory {
             AsyncKafkaLoggerAppender loggerAppender=new AsyncKafkaLoggerAppender<>();
             LoggerContext logContext=logger1.getLoggerContext();
             loggerAppender.setContext(logContext);
+            logger1.addAppender(loggerAppender);
+            return logger1;
+        }
+        return logger;
+    }
 
+    private static Logger wrapperAsynAppender(Logger logger,Level level) {
+        if (logger instanceof ch.qos.logback.classic.Logger) {
+            ch.qos.logback.classic.Logger logger1 = (ch.qos.logback.classic.Logger) logger;
+            AsyncKafkaLoggerAppender loggerAppender=new AsyncKafkaLoggerAppender<>();
+            LoggerContext logContext=logger1.getLoggerContext();
+            loggerAppender.setContext(logContext);
+            logger1.setLevel(level);
             logger1.addAppender(loggerAppender);
             return logger1;
         }
