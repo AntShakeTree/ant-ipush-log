@@ -143,11 +143,11 @@ public abstract class BeanSupport {
         return target;
     }
 
-    public static void main(String[] args) {
-
-        LogAnalytics logAnalytics = new LogAnalytics();
-        logAnalytics.setUid(2);
-        logAnalytics.setTs(234L);
-        System.out.println(BeanSupport.copyProperties(logAnalytics, new LogAnalytics()).getTs());
-    }
+//    public static void main(String[] args) {
+//
+//        LogAnalytics logAnalytics = new LogAnalytics();
+//        logAnalytics.setUid(2);
+//        logAnalytics.setTs(234L);
+//        System.out.println(BeanSupport.copyProperties(logAnalytics, new LogAnalytics()).getTs());
+//    }
 }
