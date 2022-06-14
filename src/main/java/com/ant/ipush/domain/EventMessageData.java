@@ -26,7 +26,6 @@ public class EventMessageData {
     private static final Supplier<Instant> timestampSupplier = CachingSupplier.of(clock.instant());
 
 
-
     private Map<String, Object> metaData;
     private MessagePayload payload;
     private String identifier;
@@ -76,18 +75,18 @@ public class EventMessageData {
     }
 
     public EventMessageData event(String event) {
-        this.event(event, null);
+        this.getPayload().setEvent(event);
         return this;
     }
 
     public void mergeMetaData(Map<String, Object> map) {
-        if (getMetaData()==null){
+        if (getMetaData() == null) {
             setMetaData(map);
-        }else{
-            if (map != null && !map.isEmpty()){
-                for (String key:map.keySet()) {
-                    if (map.get(key)!=null){
-                        getMetaData().put(key,map.get(key));
+        } else {
+            if (map != null && !map.isEmpty()) {
+                for (String key : map.keySet()) {
+                    if (map.get(key) != null) {
+                        getMetaData().put(key, map.get(key));
                     }
                 }
             }
